@@ -9,6 +9,8 @@ Modified and optimised by :
 Shivam Raisharma
 for Intrusion Detection and Alert System
 
+#To Do :  convert into a tf2 pipeline and procure a chip that is compatible with existing csi tools
+
 <br/>
 
 ## Prerequisite
@@ -23,7 +25,7 @@ scikit-learn
 
 ## How to run
 0. Download dataset from [here](https://drive.google.com/file/d/19uH0_z1MBLtmMLh8L4BlNA0w-XAFKipM/view?usp=sharing)  
- -> **Notice: Dataset size is ~4GB**  
+ -> **Notice: Dataset size is ~4GB as a zip file**
 
 1. "git clone" this repository.  
  
