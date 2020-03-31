@@ -22,9 +22,9 @@ threshold = 60
 
 # Parameters
 learning_rate = 0.0001
-training_iters = 2000
-batch_size = 200
-display_step = 100
+training_iters = 1000
+batch_size = 100
+display_step = 5
 
 # Network Parameters
 n_input = 90 # WiFi activity data input (img shape: 90*window_size)
@@ -33,7 +33,7 @@ n_hidden = 200 # hidden layer num of features original 200
 n_classes = 7 # WiFi activity total classes
 
 # Output folder
-OUTPUT_FOLDER_PATTERN = "LR{0}_BATCHSIZE{1}_NHIDDEN{2}/"
+OUTPUT_FOLDER_PATTERN = "LR{0}_BATCHSIZE{1}_NHIDDEN{2}_11/"
 output_folder = OUTPUT_FOLDER_PATTERN.format(learning_rate, batch_size, n_hidden)
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
@@ -95,13 +95,16 @@ y_bed, y_fall, y_pickup, y_run, y_sitdown, y_standup, y_walk = csv_import()
 print(" bed =",len(x_bed), " fall=", len(x_fall), " pickup =", len(x_pickup), " run=", len(x_run), " sitdown=", len(x_sitdown), " standup=", len(x_standup), " walk=", len(x_walk))
 
 #data shuffle
-x_bed, y_bed = shuffle(x_bed, y_bed, random_state=0)
-x_fall, y_fall = shuffle(x_fall, y_fall, random_state=0)
-x_pickup, y_pickup = shuffle(x_pickup, y_pickup, random_state=0)
-x_run, y_run = shuffle(x_run, y_run, random_state=0)
-x_sitdown, y_sitdown = shuffle(x_sitdown, y_sitdown, random_state=0)
-x_standup, y_standup = shuffle(x_standup, y_standup, random_state=0)
-x_walk, y_walk = shuffle(x_walk, y_walk, random_state=0)
+minm = min(len(y_bed),len(y_fall), len(y_pickup), len(y_run), len(y_sitdown), len(y_standup), len(y_walk))
+
+x_bed, y_bed = shuffle(x_bed[:minm], y_bed[:minm], random_state=0)
+x_fall, y_fall = shuffle(x_fall[:minm], y_fall[:minm], random_state=0)
+x_pickup, y_pickup = shuffle(x_pickup[:minm], y_pickup[:minm], random_state=0)
+x_run, y_run = shuffle(x_run[:minm], y_run[:minm], random_state=0)
+x_sitdown, y_sitdown = shuffle(x_sitdown[:minm], y_sitdown[:minm], random_state=0)
+x_standup, y_standup = shuffle(x_standup[:minm], y_standup[:minm], random_state=0)
+x_walk, y_walk = shuffle(x_walk[:minm], y_walk[:minm], random_state=0)
+print(" bed =",len(y_bed), " fall=", len(y_fall), " pickup =", len(y_pickup), " run=", len(y_run), " sitdown=", len(y_sitdown), " standup=", len(y_standup), " walk=", len(y_walk))
 
 
 #k_fold
@@ -161,6 +164,7 @@ with tf.Session() as sess:
         # Keep training until reach max iterations
         while step < training_iters:
             batch_x, batch_y = wifi_train.next_batch(batch_size)
+            print(batch_x,batch_y,sep="\n\n\n")
             x_vali = wifi_validation.images[:]
             y_vali = wifi_validation.labels[:]
             # Reshape data to get 28 seq of 28 elements
@@ -188,6 +192,7 @@ with tf.Session() as sess:
                     "{:.5f}".format(acc) + ", Minibatch Validation  Loss= " + \
                     "{:.6f}".format(loss_vali) + ", Validation Accuracy= " + \
                     "{:.5f}".format(acc_vali) )
+                saver.save(sess, output_folder + str(i)+"_"+ str(step)+ "model.ckpt")
             step += 1
 
         #Calculate the confusion_matrix
@@ -219,10 +224,10 @@ with tf.Session() as sess:
         plt.ylim([0,2])
         plt.savefig((output_folder + "Loss_" + str(i) + ".png"), dpi=150)
 
-    print("Optimization Finished!")
-    print("%.1f%% (+/- %.1f%%)" % (np.mean(cvscores), np.std(cvscores)))
-    saver.save(sess, output_folder + "model.ckpt")
+        print("Optimization Finished!")
+        print("%.1f%% (+/- %.1f%%)" % (np.mean(cvscores), np.std(cvscores)))
+        saver.save(sess, output_folder + "model.ckpt")
 
-    #Save the confusion_matrix
-    np.savetxt(output_folder + "confusion_matrix.txt", confusion_sum, delimiter=",", fmt='%d')
-    np.savetxt(output_folder + "accuracy.txt", (np.mean(cvscores), np.std(cvscores)), delimiter=".", fmt='%.1f')
+        #Save the confusion_matrix
+        np.savetxt(output_folder + "confusion_matrix.txt", confusion_sum, delimiter=",", fmt='%d')
+        np.savetxt(output_folder + "accuracy.txt", (np.mean(cvscores), np.std(cvscores)), delimiter=".", fmt='%.1f')

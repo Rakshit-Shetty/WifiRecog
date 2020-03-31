@@ -6,13 +6,14 @@ import numpy as np,numpy
 import csv
 import glob
 import pandas as pd
-
+import time
 class DataSet(object):
     def __init__(self, images, labels, fake_data=False):
         assert images.shape[0] == labels.shape[0], (
                 "images.shape: %s labels.shape: %s" % (images.shape,
                                                         labels.shape))
         self._num_examples = images.shape[0]
+        print(images.shape)
         images = images.reshape(images.shape[0],
                                 images.shape[1] * images.shape[2])
         self._images = images
@@ -61,17 +62,17 @@ def csv_import():
 #        xx = xx[::2,:]
 #        yy = yy[::2,:]
 
+        start = time.time()
         SKIPROW = 2 #Skip every 2 rows -> overlap 800ms to 600ms  (To avoid memory error)
-        num_lines = sum(1 for l in open("./input_files/xx_1000_60_" + str(i) + ".csv"))
+        num_lines = sum(1 for l in open("RedataFull\\xx_1000_60_" + str(i) + ".csv"))
         skip_idx = [x for x in range(1, num_lines) if x % SKIPROW !=0]
+        xx = np.array(pd.read_csv("RedataFull\\xx_1000_60_" + str(i) + ".csv", header=None, skiprows = skip_idx))
+        yy = np.array(pd.read_csv("RedataFull\\yy_1000_60_" + str(i) + ".csv", header=None, skiprows = skip_idx))
 
-        xx = np.array(pd.read_csv("./input_files/xx_1000_60_" + str(i) + ".csv", header=None, skiprows = skip_idx))
-        yy = np.array(pd.read_csv("./input_files/yy_1000_60_" + str(i) + ".csv", header=None, skiprows = skip_idx))
-
-        # eliminate the NoActivity Data
-        rows, cols = np.where(yy>0)
-        xx = np.delete(xx, rows[ np.where(cols==0)],0)
-        yy = np.delete(yy, rows[ np.where(cols==0)],0)
+        # # eliminate the NoActivity Data
+        # rows, cols = np.where(yy>0)
+        # xx = np.delete(xx, rows[ np.where(cols==0)],0)
+        # yy = np.delete(yy, rows[ np.where(cols==0)],0)
 
         xx = xx.reshape(len(xx),1000,90)
 
@@ -82,6 +83,8 @@ def csv_import():
         y_dic[str(i)] = yy
 
         print(str(i), "finished...", "xx=", xx.shape, "yy=",  yy.shape)
+        end =time.time()
+        print("time took in secs .... ",end - start)
 
     return x_dic["bed"], x_dic["fall"], x_dic["pickup"], x_dic["run"], x_dic["sitdown"], x_dic["standup"], x_dic["walk"], \
         y_dic["bed"], y_dic["fall"], y_dic["pickup"], y_dic["run"], y_dic["sitdown"], y_dic["standup"], y_dic["walk"]
