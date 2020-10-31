@@ -6,7 +6,7 @@ Title: [A Survey on Behaviour Recognition Using WiFi Channel State Information](
 Work by Siamak Yousefi, Hirokazu Narui, Sankalp Dayal, [Stefano Ermon](http://cs.stanford.edu/~ermon), Shahrokh Valaee
 
 Modified and optimised by : 
-Shivam Raisharma
+[Shivam Raisharma](https://github.com/ShivamSRS), [Anand Vishwakarma](https://github.com/mr-awesome-1), [Rakshit Shetty](https://github.com/Rakshit-Shetty), [Kaustubh Shete](https://github.com/kaustubhKVS), Disha Revandkar
 for Intrusion Detection and Alert System
 
 #To Do :  convert into a tf2 pipeline and procure a chip that is compatible with existing csi tools
